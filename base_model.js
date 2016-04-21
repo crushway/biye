@@ -79,7 +79,6 @@ module.exports = function () {
         for (var i = 0; i < urlArray.length; i++) {
             var urlName = urlArray[i];
             var sql = 'select * from ' + tableName + " where url_name='" + urlName + "'";
-            console.log(sql);
             dbClient.query(sql,
                 function (urlName,error, results) {
                     if (error) {
