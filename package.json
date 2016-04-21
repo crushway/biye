@@ -1,0 +1,19 @@
+{
+  "name": "biye",
+  "version": "0.0.0",
+  "description": "使用 superagent 与 cheerio 完成简单爬虫",
+  "main": "app.js",
+  "dependencies": {
+    "cheerio": "^0.17.0",
+    "superagent": "^1.4.0",
+    "iconv-lite": "0.4.13",
+    "async": "^1.5.0",
+    "eventproxy": "^0.3.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "qing <qingzhi_xie@foxmail.com>",
+  "license": "MIT"
+}
