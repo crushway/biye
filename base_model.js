@@ -76,32 +76,97 @@ module.exports = function () {
      * 插入数据时检查是否重复
      */
     this.insertUnique = function (tableName, urlArray) {
-        for (var i = 0; i < urlArray.length; i++) {
-            var urlName = urlArray[i];
-            var sql = 'select * from ' + tableName + " where url_name='" + urlName + "'";
-            dbClient.query(sql,
-                function (urlName,error, results) {
-                    if (error) {
-                        console.log('GetData Error: ' + error.message);
-                        dbClient.end();
-                    } else {
-                        if (results.length!=0) { //如果查询到数据则不操作
-                            console.log("==========已经有数据！！！==========="+results.length);
-                            return;
-                        } else { //查询数据为空则插入数据
-                            console.log("==========需要插入数据！！！===========")
-                            var rowInfo = {};
-                            rowInfo.url_name = urlName;
-                            dbClient.query('INSERT INTO ' + tableName + ' SET ?', rowInfo, function (err, result) {
-                                if (err) throw err;
-                            });
-                        }
-                    }
-                }.bind(this,urlName));
+        if(urlArray.length==0){
+            return;
         }
+        //从线程池中获得一个连接
+        dbClient.getConnection(function(err, conn){
+
+            if (err) {
+                console.log(err);
+            }
+            var insertNumber=[];
+            for (var i = 0; i < urlArray.length; i++) {
+                insertNumber.push('(\''+urlArray[i]+'\')');
+            }
+            conn.query('INSERT INTO ' + tableName + '(url_name) values'+insertNumber.join(), function (err, result) {
+                if (err) throw err;
+                console.dir(result.message);
+                conn.release();
+            });
+
+           /* //使用async保证全部插入完成后再commit transaction
+            async.parallel([
+                storeStudent(student.baseInfo, "base_info"),
+                storeStudent(student.studyHistory, "study_history", ["begin", "end", "school", "student_no"]),
+                storeStudent(student.classHistory, "class_history", ["class_name", "score", "school_year", "student_no"]),
+                storeStudent(student.family, "family", ["name", "relation", "work", "cell", "student_no"]),
+                storeStudent(student.awards, "awards", ["award_name", "money", "student_no"]),
+                function(){
+                    //释放线程
+                    conn.release();
+                    callback({
+                        "error": false,
+                        "message": "student " + stuNo + " stored!",
+                        "stuNo": stuNo
+                    });
+                    return true;
+                }
+            ]);//async任务结束*/
+           /* for (var i = 0; i < urlArray.length; i++) {
+                var urlName = urlArray[i];
+                var sql = 'select * from ' + tableName + " where url_name='" + urlName + "'";
+                conn.query(sql,
+                    function (urlName,error, results) {
+                            if (results.length!=0) { //如果查询到数据则不操作
+                                console.log("==========已经有数据！！！==========="+results.length);
+                                return;
+                            } else { //查询数据为空则插入数据
+                                console.log("==========需要插入数据！！！==========="+urlName)
+                                var rowInfo = {};
+                                rowInfo.url_name = urlName;
+                                conn.query('INSERT INTO ' + tableName + ' SET ?', rowInfo, function (err, result) {
+                                    if (err) throw err;
+                                    console.dir(result);
+                                    conn.release();
+                                });
+                            
+                        }
+                    }.bind(this,urlName));
+            }*/
+            
+          
+        });
+       
 
     };
 
+    /**
+     * 检查数据存在
+     * @param stuNo
+     * @param callback
+     */
+    function urlExists(table,url, callback){
+
+        dbClient.getConnection(function(err, conn){
+
+            conn.query('select * from ' + table + " where url_name='" + url + "'", function(err, result){
+                if (err) {
+                    console.log(err.message);
+                }
+
+                conn.release();
+                if (result.length) {
+                    callback(true);
+                    return true;
+                }
+                else{
+                    callback(false);
+                    return false;
+                }
+            });
+        });
+    }
 
     /**
      *
@@ -192,22 +257,30 @@ module.exports = function () {
      * 数据库连接构造函数
      */
     function __constructor() {
-        var dbConfig = Util.get('config.json', 'db');
-        /* 获取mysql配置信息 */
-        client = {};
-        client.host = dbConfig['host'];
-        client.port = dbConfig['port'];
-        client.user = dbConfig['user'];
-        client.password = dbConfig['password'];
-        dbClient = mysql.createConnection(client);
-        dbClient.connect();
-        /* 执行mysql指令，连接mysql服务器的一个数据库 */
-        dbClient.query('USE ' + dbConfig['dbName'], function (error, results) {
-            if (error) {
-                console.log('ClientConnectionReady Error: ' + error.message);
-                dbClient.end();
-            }
-            console.log('connection local mysql success');
+        /*var dbConfig = Util.get('config.json', 'db');
+         /!* 获取mysql配置信息 *!/
+         client = {};
+         client.host = dbConfig['host'];
+         client.port = dbConfig['port'];
+         client.user = dbConfig['user'];
+         client.password = dbConfig['password'];
+         dbClient = mysql.createConnection(client);
+         dbClient.connect();
+         /!* 执行mysql指令，连接mysql服务器的一个数据库 *!/
+         dbClient.query('USE ' + dbConfig['dbName'], function (error, results) {
+         if (error) {
+         console.log('ClientConnectionReady Error: ' + error.message);
+         dbClient.end();
+         }
+         console.log('connection local mysql success');
+         });*/
+
+        dbClient = mysql.createPool({
+            host: 'localhost',
+            user: 'root',
+            password: 'qz6124003',
+            database: 'zhongguancun',
+            connectionLimit: 15
         });
     }
 }

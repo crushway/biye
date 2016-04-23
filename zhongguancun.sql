@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `product`(
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `url`(
+CREATE TABLE IF NOT EXISTS `urls`(
   `url_id` int(11) not null auto_increment,
   `url_name` varchar(100) COLLATE utf8_bin NOT NULL,
   `is_crawled` tinyint(1) not null default 0,
