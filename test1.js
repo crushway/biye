@@ -43,27 +43,30 @@ redisClient.on('connect', function () {
 var getInitUrlList = function () {
     var urlArray = [];
     /*存储所有链接的数组*/
-    //allCrawledUrl,uncrawledUrl,targetUrl,crawledUrl
-    redisClient.del('allCrawledUrl', function (err,reply) {
-        if(err){
+    //allCrawledUrl,unCrawledUrl,targetUrl,crawledUrl
+    redisClient.del('allCrawledUrl', function (err, reply) {
+        if (err) {
             console.log(err);
 
         }
         console.log(reply);
-    }); redisClient.del('uncrawledUrl', function (err,reply) {
-        if(err){
+    });
+    redisClient.del('unCrawledUrl', function (err, reply) {
+        if (err) {
             console.log(err);
 
         }
         console.log(reply);
-    }); redisClient.del('targetUrl', function (err,reply) {
-        if(err){
+    });
+    redisClient.del('targetUrl', function (err, reply) {
+        if (err) {
             console.log(err);
 
         }
         console.log(reply);
-    }); redisClient.del('crawledUrl', function (err,reply) {
-        if(err){
+    });
+    redisClient.del('crawledUrl', function (err, reply) {
+        if (err) {
             console.log(err);
 
         }
@@ -145,66 +148,184 @@ var handleUrlIndex = function (arr) {
  * @param arr
  * @returns {Array}
  */
-var handleUrl = function (arr,callback) {
-    var result = [], hash = {}, target_temp = [],tempReply=1;
+var handleUrl = function (arr) {
+    // console.log("进入url处理===================");
+    var result = [], elem,flag=-1;
     var reg = /^\/\w.+\/+(index\d+|\d+)\./;//正则取出商品链接或者翻页链接,以/开头，结尾是index+数字或者数字再加点
     var regLarge = /^\/\w.+/; //所有开头是斜杠的url
     var target = /^\/\w.+index\d+\./;
-    for (var i = 0, elem; (elem = arr[i]) != null; i++) {
+    for (var i = 0; (elem = arr[i]) != null; i++) {
         // console.log(elem);
-        if (reg.exec(elem)) {
-            redisClient.sismember('allCrawledUrl', elem,function (err,reply) {
-                if(err){
+        if(reg.exec(elem)){
+            redisClient.sismember('allCrawledUrl', elem, function (elem,err, reply) {
+                if (err) {
                     console.log(err);
                 }
-                console.log(reply);
-                if(reply==0){
-                    addData();
-                }
-            })
+                add1(elem,reply);
+            }.bind(this,elem));
+        }
+
+        function  add1(elem,status) {
+            // console.log("==================="+elem+"====================");
+
+            if (status == 0) {
+                result.push(elem);
+
+                //所有的url的集合
+                redisClient.sadd('allCrawledUrl', elem, function (err, reply) {
+                    if (err) {
+                        console.log(err);
+                    }else{
+                        add2(elem,reply);
+                    }
+
+                });
+            }
+        }
+        function add2(elem,status) {
+            // console.dir("=====================" + elem);
+
+            if (status && target.exec(elem)) {
+                redisClient.sadd('targetUrl', elem, function (err, reply) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    // console.log("redis插入数据targetUrl：" + reply);
 
 
-            function addData() {
-                    // elem = elem + prefix;
-                    // console.log("进去url==========================================================================================")
-                    result.push(elem);
-                    //所有的url的集合
-                    redisClient.sadd('allCrawledUrl', elem, function (err, reply) {
-                        if(err){
-                            console.log(err);
-                        }
-                        console.log("redis插入数据allCrawledUrl：" + reply+'elem:'+elem);
-                        //存入目标商品url
-                        if (target.exec(elem)) {
-                            redisClient.sadd('targetUrl', elem, function (err, reply) {
-                                if(err){
-                                    console.log(err);
-                                }
-                                console.log("redis插入数据targetUrl：" + reply);
-                                return result;
-                            });
+                });
 
-                        } else {
-                            //进入待爬取url
-                            redisClient.sadd('unCrawledUrl', elem, function (err, reply) {
-                                if(err){
-                                    console.log(err);
-                                }
-                                // console.log("redis插入数据unCrawledUrl：" + reply);
-                                callback(null, "成功抓取" + result.length + "个需要URL      " + url)
-
-                                // return result;
-                            });
-                        }
-                    });
-
-                }
-
+            } else if(status) {
+                //进入待爬取url
+                redisClient.sadd('unCrawledUrl', elem, function (err, reply) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    // console.log("redis插入数据unCrawledUrl：" + reply);
+                });
+            }
 
         }
+
     }
 
 }
+
+       /* if (reg.exec(elem)) {
+            async.waterfall([
+                function (callback) {
+                    redisClient.sismember('allCrawledUrl', elem, function (err, reply) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.dir("=====================" + elem);
+                        callback(null, reply, elem);//没有存在返回0，去插入
+                    });
+
+                },
+                function (status, elem, callback) {
+                    // console.log("==================="+elem+"====================");
+
+                    if (status == 0) {
+                        result.push(elem);
+
+                        //所有的url的集合
+                        redisClient.sadd('allCrawledUrl', elem, function (err, reply) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            callback(null, 0);
+                        });
+                    }
+                    else {
+                        callback(null, 1);
+
+                    }
+                },
+                function (status, callback) {
+                    if (status && target.exec(elem)) {
+                        redisClient.sadd('targetUrl', elem, function (err, reply) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log("redis插入数据targetUrl：" + reply);
+                            callback(null, reply);
+
+                        });
+
+                    } else {
+                        //进入待爬取url
+                        redisClient.sadd('unCrawledUrl', elem, function (err, reply) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log("redis插入数据unCrawledUrl：" + reply);
+                            callback(null, reply);
+                        });
+                    }
+
+                }
+            ], function (err, result) {
+                if (err) {
+                    console.log('handleUrl err: ', err);
+                } else {
+                    console.log('handleUrl result: ', result);
+                }
+            });
+        }
+*/
+
+        /*if (reg.exec(elem)) {
+         redisClient.sismember('allCrawledUrl', elem, function (err, reply) {
+         if (err) {
+         console.log(err);
+         }
+         console.log(reply);
+         if (reply == 0) {
+         console.log("现在的url是：" + elem);
+         addData();
+         }
+         })
+
+
+         function addData() {
+         // elem = elem + prefix;
+         // console.log("进去url==========================================================================================")
+         result.push(elem);
+         //所有的url的集合
+         redisClient.sadd('allCrawledUrl', elem, function (err, reply) {
+         if (err) {
+         console.log(err);
+         }
+         console.log("redis插入数据allCrawledUrl：" + reply + 'elem:' + elem);
+         //存入目标商品url
+         if (target.exec(elem)) {
+         redisClient.sadd('targetUrl', elem, function (err, reply) {
+         if (err) {
+         console.log(err);
+         }
+         console.log("redis插入数据targetUrl：" + reply);
+         return result;
+         });
+
+         } else {
+         //进入待爬取url
+         redisClient.sadd('unCrawledUrl', elem, function (err, reply) {
+         if (err) {
+         console.log(err);
+         }
+         // console.log("redis插入数据unCrawledUrl：" + reply);
+
+         // return result;
+         });
+         }
+         });
+
+         }
+
+
+         }*/
+
 /**
  * 从未爬取队列中获取要爬取的url，并把url放入已爬取队列
  * @returns {Array}
@@ -213,15 +334,15 @@ var bingfa = function () {
     var temp = [];
     var flag = 0;
     for (var i = 0; i < 40; i++) {
-        if (redisClient.SCARD('unCrawledUrl')) {
+
             redisClient.spop('unCrawledUrl', function (err, result) {
-                temp.push(result);
-                count();
+                if(result!='nil'){
+                    temp.push(result);
+                    count();
+                }
+
             })
-        } else {
-            count();
         }
-    }
 
     function count() {
         flag++;
@@ -263,8 +384,14 @@ var bingfa = function () {
                         }
                         console.log('已爬crawledUrl:' + result);
                     })
-                    console.log('===========并发数为' + bfNumber + '，进入并发查询=======')
-                    async.mapLimit(temp, bfNumber, function (url, callback) {
+                    if(temp.length<10){
+                        //最后需要爬取的url很少达不到并发数，需要改变并发数
+                        var nowBingfa=temp.length;
+                    }else{
+                        var nowBingfa=bfNumber;
+                    }
+                    console.log('===========并发数为' + nowBingfa + '，进入并发查询=======')
+                    async.mapLimit(temp, nowBingfa, function (url, callback) {
                         getUrlList(url, callback);
                     }, function (err, result) {
                         // res.send(result);
@@ -288,12 +415,46 @@ var bingfa = function () {
  */
 var getUrlList = function (url, callback) {
     var urlArray = [];
-   /* if (in_array(url, crawledUrl)) {
-        callback(null, "已经抓取过的url  " + url);
-        return;
-    }*/
+    // console.log("当前url" + prefix + url);
+    /* if (in_array(url, crawledUrl)) {
+     callback(null, "已经抓取过的url  " + url);
+     return;
+     }*/
+    var reg=/http/;
+    if(reg.exec(url)||url==null||url=='undefined'){
+        callback(null, "url错误：   " + url);
+
+    }else{
+        request.get(prefix + url)
+            .end(function (err, res) {
+                if (err) {
+                    console.log("请求url时出错");
+                    callback(null, "请求错误   " + url);
+                } else {
+                    var $ = cheerio.load(res.text);
+
+                    $("a").each(function () {
+                        urlArray.push($(this).attr("href"));
+                    });
+                    // urlArray = uniqueArr(urlArray);
+                    /* async.series([
+                     urlArray = handleUrl(urlArray),
+                     callback(null, "成功抓取" + urlArray.length + "个需要URL      " + url)
+                     ]);*/
+                    urlArray = handleUrl(urlArray);
+                    callback(null, "成功抓取URL   " + url);
+                    // console.dir(urlArray);
+                    //插入数据库
+                    /*if (urlArray.length) {
+                     baseModel.insertUnique(tableName, urlArray);
+
+                     }*/
+
+                }
+            });
+    }
     /*存储所有链接的数组*/
-    request.get(prefix+url)
+   /* request.get(prefix + url)
         .end(function (err, res) {
             if (err) {
                 console.log(err);
@@ -304,21 +465,21 @@ var getUrlList = function (url, callback) {
                     urlArray.push($(this).attr("href"));
                 });
                 // urlArray = uniqueArr(urlArray);
-               /* async.series([
-                    urlArray = handleUrl(urlArray),
-                    callback(null, "成功抓取" + urlArray.length + "个需要URL      " + url)
-                ]);*/
+                /!* async.series([
+                 urlArray = handleUrl(urlArray),
+                 callback(null, "成功抓取" + urlArray.length + "个需要URL      " + url)
+                 ]);*!/
                 urlArray = handleUrl(urlArray);
-               //  callback(null, "成功抓取" + urlArray.length + "个需要URL      " + url);*/
+                callback(null, "成功抓取URL   " + url);
                 // console.dir(urlArray);
                 //插入数据库
-                /*if (urlArray.length) {
+                /!*if (urlArray.length) {
                  baseModel.insertUnique(tableName, urlArray);
 
-                 }*/
+                 }*!/
 
             }
-        });
+        });*/
 }
 
 /**
@@ -376,10 +537,6 @@ var uniqueArrIndex = function (arr) {
 
     return result;
 }
-
-
-
-
 
 
 /**
