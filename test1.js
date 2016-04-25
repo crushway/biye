@@ -503,47 +503,76 @@ var getData = function (url, callback) {
             html += data;
         });
         res.on('end', function () {
-            //var buf = new Buffer(html, 'binary');
-            //var html = iconv.decode(buf, 'GBK');
-            //console.log(str);
-            //html = iconv.decode(html, 'gbk');
-            var info = {};
+            var info={};
             var $ = cheerio.load(html);
             var something = $("div.breadcrumb a");
-            //类别
-            var product_category = $(something[1]).text().trim();
-            var buf = new Buffer(product_category, 'binary');
-            info.product_category = iconv.decode(buf, 'GBK');
-            //品牌
-            var product_brand = $(something[2]).text().trim();
+            async.series(
+                [
+                    function (cb) {
+                        //类别
+                        var product_category = $(something[1]).text().trim();
+                        var buf = new Buffer(product_category, 'binary');
+                        product_category = iconv.decode(buf, 'GBK');
+                        cb(null,product_category);
+                    },
+                    function (cb) {
+                        //品牌
+                        var product_brand = $(something[2]).text().trim();
+                        var buf = new Buffer(product_brand, 'binary');
+                        product_brand = iconv.decode(buf, 'GBK');
+                        cb(null,product_brand);
+                    },
+                    function (cb) {
+                        //商品名称
+                        if(something.length==4){
+                            var product_name = $(".breadcrumb h1").text().trim();
+                            var buf = new Buffer(product_name, 'binary');
+                            product_name = iconv.decode(buf, 'GBK');
+                            cb(null,product_name);
 
-            var buf = new Buffer(product_brand, 'binary');
-            info.product_brand = iconv.decode(buf, 'GBK');
+                        }else{
+                            var product_name = $(".page-title h1").text().trim();
+                            var buf = new Buffer(product_name, 'binary');
+                            product_name = iconv.decode(buf, 'GBK');
+                            cb(null,product_name);
 
-            //商品名称
-            var product_name = $(".page-title h1").text().trim();
-            var buf = new Buffer(product_name, 'binary');
-            info.product_name = iconv.decode(buf, 'GBK');
+                        }
+                    },
+                    function (cb) {
+                        //商品描述
+                        var product_desc = $(".subtitle").text().trim();
+                        if (product_desc) {
+                            var buf = new Buffer(product_desc, 'binary');
+                            product_desc = iconv.decode(buf, 'GBK');
+                            cb(null,product_desc);
+                        }else{
+                            cb(null,'无');
+                        }
+                    },
+                    function (cb) {
+                        //价格
+                        var product_price = $(".price-sign").next().text().trim();
+                        if (product_price) {
 
-            //商品描述
-            var product_desc = $(".subtitle").text().trim();
-            if (product_desc) {
-                var buf = new Buffer(product_desc, 'binary');
-                info.product_desc = iconv.decode(buf, 'GBK');
-            }
-            //价格
-            var product_price = $(".price-sign").next().text().trim();
-            if (product_price) {
+                        } else {
+                             product_price = $(".price-type").text().trim();
+                        }
+                        var buf = new Buffer(product_price, 'binary');
+                        product_price = iconv.decode(buf, 'GBK');
+                        cb(null,product_price);
 
-            } else {
-                var product_price = $(".price-type").text().trim();
-            }
-            var buf = new Buffer(product_price, 'binary');
-            info.product_price = iconv.decode(buf, 'GBK');
+                    }
+                ],function (err,values) {
+                    info.product_category=values[0];
+                    info.product_brand=values[1];
+                    info.product_name=values[2];
+                    info.product_desc=values[3];
+                    info.product_price=values[4];
+                    info.product_url=url;
 
-            //url
-            info.product_url = url;
-            baseModel.insertProduct('product', info);
+                    baseModel.insertProduct('product', info);
+                }
+            )
             callback(null, "成功抓取信息：   " + url);
         });
     }).on('error', function () {
