@@ -337,16 +337,13 @@ var bingfa = function () {
     var temp = [];
     var flag = 0;
     for (var i = 0; i < 40; i++) {
-
         redisClient.spop('unCrawledUrl', function (err, result) {
             if (result != 'nil') {
                 temp.push(result);
-                count();
             }
-
+            count();
         })
     }
-
     function count() {
         flag++;
         if (flag == 40) {
@@ -395,6 +392,8 @@ var bingfa = function () {
                     }
                     console.log('===========并发数为' + nowBingfa + '，进入并发查询=======')
                     async.mapLimit(temp, nowBingfa, function (url, callback) {
+                        // if(url)
+                        console.dir(url);
                         getUrlList(url, callback);
                     }, function (err, result) {
                         // res.send(result);
@@ -402,13 +401,11 @@ var bingfa = function () {
                         bingfa();
                     });
                 }
-
                 // return temp;
             });
 
         }
     }
-
 }
 
 
@@ -469,10 +466,9 @@ var getUrlList = function (url, callback) {
  */
 var getUrls = function (url, callback) {
     var urlArray = [];
-    request.get(url)
+    request.get(url).set(config)
         .end(function (err, res) {
             if (err) {
-                console.log("请求url时出错");
                 callback(null, "请求错误   " + url);
             } else {
                 var $ = cheerio.load(res.text);
@@ -503,7 +499,7 @@ var getData = function (url, callback) {
             html += data;
         });
         res.on('end', function () {
-            var info={};
+            var info = {};
             var $ = cheerio.load(html);
             var something = $("div.breadcrumb a");
             async.series(
@@ -513,30 +509,46 @@ var getData = function (url, callback) {
                         var product_category = $(something[1]).text().trim();
                         var buf = new Buffer(product_category, 'binary');
                         product_category = iconv.decode(buf, 'GBK');
-                        cb(null,product_category);
+                        cb(null, product_category);
                     },
                     function (cb) {
                         //品牌
                         var product_brand = $(something[2]).text().trim();
                         var buf = new Buffer(product_brand, 'binary');
                         product_brand = iconv.decode(buf, 'GBK');
-                        cb(null,product_brand);
+                        cb(null, product_brand);
                     },
                     function (cb) {
                         //商品名称
-                        if(something.length==4){
-                            var product_name = $(".breadcrumb h1").text().trim();
+                        var product_name;
+                        if (something.length == 4) {
+                            product_name = $(".breadcrumb h1").text().trim();
                             var buf = new Buffer(product_name, 'binary');
                             product_name = iconv.decode(buf, 'GBK');
-                            cb(null,product_name);
 
-                        }else{
-                            var product_name = $(".page-title h1").text().trim();
+                        } else {
+                            product_name = $(".page-title h1").text().trim();
                             var buf = new Buffer(product_name, 'binary');
                             product_name = iconv.decode(buf, 'GBK');
-                            cb(null,product_name);
-
                         }
+                        if (!product_name) {
+                            product_name = $(".product-name").text().trim();
+                            var buf = new Buffer(product_name, 'binary');
+                            product_name = iconv.decode(buf, 'GBK');
+                        }
+                        if (!product_name) {
+                            product_name = $(".product-name").text().trim();
+                            var buf = new Buffer(product_name, 'binary');
+                            product_name = iconv.decode(buf, 'GBK');
+                        }
+                        if (!product_name) {
+                            product_name = $(".breadcrumb span").text().trim();
+                            var buf = new Buffer(product_name, 'binary');
+                            product_name = iconv.decode(buf, 'GBK');
+                        }
+                        cb(null, product_name);
+
+
                     },
                     function (cb) {
                         //商品描述
@@ -544,9 +556,9 @@ var getData = function (url, callback) {
                         if (product_desc) {
                             var buf = new Buffer(product_desc, 'binary');
                             product_desc = iconv.decode(buf, 'GBK');
-                            cb(null,product_desc);
-                        }else{
-                            cb(null,'无');
+                            cb(null, product_desc);
+                        } else {
+                            cb(null, '无');
                         }
                     },
                     function (cb) {
@@ -555,20 +567,20 @@ var getData = function (url, callback) {
                         if (product_price) {
 
                         } else {
-                             product_price = $(".price-type").text().trim();
+                            product_price = $(".price-type").text().trim();
                         }
                         var buf = new Buffer(product_price, 'binary');
                         product_price = iconv.decode(buf, 'GBK');
-                        cb(null,product_price);
+                        cb(null, product_price);
 
                     }
-                ],function (err,values) {
-                    info.product_category=values[0];
-                    info.product_brand=values[1];
-                    info.product_name=values[2];
-                    info.product_desc=values[3];
-                    info.product_price=values[4];
-                    info.product_url=url;
+                ], function (err, values) {
+                    info.product_category = values[0];
+                    info.product_brand = values[1];
+                    info.product_name = values[2];
+                    info.product_desc = values[3];
+                    info.product_price = values[4];
+                    info.product_url = url;
 
                     baseModel.insertProduct('product', info);
                 }

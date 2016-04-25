@@ -6,10 +6,18 @@ var url = 'http://detail.zol.com.cn/server/index388856.shtml';
 var url = 'http://detail.zol.com.cn/digital_camcorder/index378339.shtml';
 // var url = 'http://detail.zol.com.cn/digital_storage/index48067.shtml';
 // var url = 'http://detail.zol.com.cn/e-cigarettes/index607776.shtml';
- var url = 'http://detail.zol.com.cn/server/index320722.shtml';
+ var url = 'http://detail.zol.com.cn/HIFI_Mobilephone/index405911.shtml';
+ // var url = 'http://detail.zol.com.cn/tablepc/index321392.shtml';
+ // var url = 'http://detail.zol.com.cn/Outdoorcushion/index512720.shtml';
 var cheerio = require('cheerio');
 var iconv = require('iconv-lite');
 var async = require("async");
+var options = {
+    hostname: url,
+    port: 80,
+    path: '/upload',
+    method: 'POST'
+};
 
 var BaseModel = require('./base_model')
     , baseModel = new BaseModel()
@@ -20,15 +28,18 @@ http.get(url, function (res) {
         html += data;
     })
     res.on('end', function () {
-        crawlerProduct(html);
+        crawlerProduct(url,html);
     })
 }).on('error', function () {
     console.log('爬取页面错误');
 });
 
-function crawlerProduct(html) {
+function crawlerProduct(url,html) {
     var info={};
+   /* var reg=/\/\w+\//;//取出url商品类目
+    var subcate=reg.exec(url);*/
     var $ = cheerio.load(html);
+    // console.dir($("div.breadcrumb a"));
     var something = $("div.breadcrumb a");
     async.series(
         [
@@ -56,6 +67,16 @@ function crawlerProduct(html) {
                     product_name = iconv.decode(buf, 'GBK');
                 }else{
                     var product_name = $(".page-title h1").text().trim();
+                    var buf = new Buffer(product_name, 'binary');
+                    product_name = iconv.decode(buf, 'GBK');
+                }
+                if(!product_name){
+                    var product_name = $(".product-name").text().trim();
+                    var buf = new Buffer(product_name, 'binary');
+                    product_name = iconv.decode(buf, 'GBK');
+                }
+                if(!product_name){
+                    var product_name = $(".breadcrumb span").text().trim();
                     var buf = new Buffer(product_name, 'binary');
                     product_name = iconv.decode(buf, 'GBK');
                 }
