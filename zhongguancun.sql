@@ -58,3 +58,15 @@ CREATE TABLE IF NOT EXISTS `crawledUrl`(
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`url_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `product`(
+  `product_id` int(11) not null auto_increment,
+  `product_name` varchar(100) COLLATE utf8_bin NOT NULL,
+  `product_price` varchar(10)  null,
+  `product_category` varchar(100) COLLATE utf8_bin NOT NULL,
+  `product_brand` varchar(100) COLLATE utf8_bin NOT NULL,
+  `product_desc`  varchar(100) default null,
+  `product_url` varchar(100) COLLATE utf8_bin NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;

@@ -81,9 +81,22 @@ module.exports = function () {
                 // console.dir(result);
                 // conn.release();
             });
+    }; 
+    
+    this.insertProduct = function (tableName, info) {
+        //从线程池中获得一个连接
+        dbClient.getConnection(function(err, conn){
 
-
-
+            if (err) {
+                console.log(err);
+            }
+            conn.query('INSERT INTO ' + tableName + ' SET ?', info, function (err, result) {
+                if (err) throw err;
+                // console.log("插入"+tableName+result.affectedRows);
+                // console.dir(info);
+                conn.release();
+            });
+        });
 
     };
     var insertFun = function (tableName, arr) {
@@ -286,7 +299,7 @@ module.exports = function () {
          host: 'localhost',
          user: 'root',
          password: 'qz6124003',
-         database: 'zhongguancun1',
+         database: 'zhongguancun',
          connectionLimit: 15
          });
          console.log('connection local mysql success');

@@ -1,0 +1,169 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'i',
+1 verbose cli   'superagent-charset',
+1 verbose cli   '--save' ]
+2 info using npm@2.14.12
+3 info using node@v4.2.4
+4 verbose install initial load of /mnt/hgfs/project/www/biye/package.json
+5 warn package.json biye@0.0.0 No repository field.
+6 warn package.json biye@0.0.0 No README data
+7 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/async/package.json
+8 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/cheerio/package.json
+9 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/eventproxy/package.json
+10 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/iconv-lite/package.json
+11 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/mysql/package.json
+12 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/redis/package.json
+13 verbose installManyTop reading scoped package data from /mnt/hgfs/project/www/biye/node_modules/superagent/package.json
+14 info package.json cheerio@0.17.0 No license field.
+15 verbose readDependencies loading dependencies from /mnt/hgfs/project/www/biye/package.json
+16 silly cache add args [ 'superagent-charset', null ]
+17 verbose cache add spec superagent-charset
+18 silly cache add parsed spec Result {
+18 silly cache add   raw: 'superagent-charset',
+18 silly cache add   scope: null,
+18 silly cache add   name: 'superagent-charset',
+18 silly cache add   rawSpec: '',
+18 silly cache add   spec: 'latest',
+18 silly cache add   type: 'tag' }
+19 silly addNamed superagent-charset@latest
+20 verbose addNamed "latest" is being treated as a dist-tag for superagent-charset
+21 info addNameTag [ 'superagent-charset', 'latest' ]
+22 silly mapToRegistry name superagent-charset
+23 silly mapToRegistry using default registry
+24 silly mapToRegistry registry https://registry.npmjs.org/
+25 silly mapToRegistry uri https://registry.npmjs.org/superagent-charset
+26 verbose addNameTag registry:https://registry.npmjs.org/superagent-charset not in flight; fetching
+27 verbose request uri https://registry.npmjs.org/superagent-charset
+28 verbose request no auth needed
+29 info attempt registry request try #1 at 10:03:00
+30 verbose request id 6dbb4f6aa5817ddb
+31 verbose etag "8TY78ZRNPV4IENCBI2TNI56PU"
+32 http request GET https://registry.npmjs.org/superagent-charset
+33 http 304 https://registry.npmjs.org/superagent-charset
+34 verbose headers { date: 'Mon, 25 Apr 2016 02:03:00 GMT',
+34 verbose headers   via: '1.1 varnish',
+34 verbose headers   'cache-control': 'max-age=300',
+34 verbose headers   etag: '"8TY78ZRNPV4IENCBI2TNI56PU"',
+34 verbose headers   age: '229',
+34 verbose headers   connection: 'keep-alive',
+34 verbose headers   'x-served-by': 'cache-lax1431-LAX',
+34 verbose headers   'x-cache': 'HIT',
+34 verbose headers   'x-cache-hits': '1',
+34 verbose headers   'x-timer': 'S1461549780.900464,VS0,VE0',
+34 verbose headers   vary: 'Accept-Encoding' }
+35 silly get cb [ 304,
+35 silly get   { date: 'Mon, 25 Apr 2016 02:03:00 GMT',
+35 silly get     via: '1.1 varnish',
+35 silly get     'cache-control': 'max-age=300',
+35 silly get     etag: '"8TY78ZRNPV4IENCBI2TNI56PU"',
+35 silly get     age: '229',
+35 silly get     connection: 'keep-alive',
+35 silly get     'x-served-by': 'cache-lax1431-LAX',
+35 silly get     'x-cache': 'HIT',
+35 silly get     'x-cache-hits': '1',
+35 silly get     'x-timer': 'S1461549780.900464,VS0,VE0',
+35 silly get     vary: 'Accept-Encoding' } ]
+36 verbose etag https://registry.npmjs.org/superagent-charset from cache
+37 verbose get saving superagent-charset to /root/.npm/registry.npmjs.org/superagent-charset/.cache.json
+38 silly addNameTag next cb for superagent-charset with tag latest
+39 silly addNamed superagent-charset@1.0.0
+40 verbose addNamed "1.0.0" is a plain semver version for superagent-charset
+41 silly cache afterAdd superagent-charset@1.0.0
+42 verbose afterAdd /root/.npm/superagent-charset/1.0.0/package/package.json not in flight; writing
+43 verbose afterAdd /root/.npm/superagent-charset/1.0.0/package/package.json written
+44 silly install resolved [ { name: 'superagent-charset',
+44 silly install resolved     version: '1.0.0',
+44 silly install resolved     description: 'add charset support for node\'s superagent',
+44 silly install resolved     main: 'index.js',
+44 silly install resolved     dependencies: { 'iconv-lite': '^0.4.13' },
+44 silly install resolved     scripts:
+44 silly install resolved      { test: 'mocha -R spec',
+44 silly install resolved        'test-cover': 'istanbul cover _mocha -- -R spec -u exports' },
+44 silly install resolved     repository:
+44 silly install resolved      { type: 'git',
+44 silly install resolved        url: 'git+ssh://git@github.com/magicdawn/superagent-charset.git' },
+44 silly install resolved     keywords: [ 'superagent', 'encoding', 'charset', 'gbk', 'gb2312', 'iconv' ],
+44 silly install resolved     author: { name: 'magicdawn' },
+44 silly install resolved     license: 'MIT',
+44 silly install resolved     bugs: { url: 'https://github.com/magicdawn/superagent-charset/issues' },
+44 silly install resolved     homepage: 'https://github.com/magicdawn/superagent-charset',
+44 silly install resolved     devDependencies:
+44 silly install resolved      { coveralls: '^2.11.8',
+44 silly install resolved        istanbul: '^0.4.2',
+44 silly install resolved        mocha: '^2.4.5',
+44 silly install resolved        should: '^8.2.2' },
+44 silly install resolved     gitHead: '4d89844fc09444c08e3643033034d8931b15595b',
+44 silly install resolved     _id: 'superagent-charset@1.0.0',
+44 silly install resolved     _shasum: '82a0e8b774a8c8a6bd520d578c554a64ec23938b',
+44 silly install resolved     _from: 'superagent-charset@latest',
+44 silly install resolved     _npmVersion: '2.14.12',
+44 silly install resolved     _nodeVersion: '4.2.6',
+44 silly install resolved     _npmUser: { name: 'magicdawn', email: 'magicdawn@qq.com' },
+44 silly install resolved     dist:
+44 silly install resolved      { shasum: '82a0e8b774a8c8a6bd520d578c554a64ec23938b',
+44 silly install resolved        tarball: 'https://registry.npmjs.org/superagent-charset/-/superagent-charset-1.0.0.tgz' },
+44 silly install resolved     maintainers: [ [Object] ],
+44 silly install resolved     _npmOperationalInternal:
+44 silly install resolved      { host: 'packages-12-west.internal.npmjs.com',
+44 silly install resolved        tmp: 'tmp/superagent-charset-1.0.0.tgz_1457240541301_0.2719766264781356' },
+44 silly install resolved     directories: {},
+44 silly install resolved     _resolved: 'https://registry.npmjs.org/superagent-charset/-/superagent-charset-1.0.0.tgz',
+44 silly install resolved     readme: 'ERROR: No README data found!' } ]
+45 info install superagent-charset@1.0.0 into /mnt/hgfs/project/www/biye
+46 info installOne superagent-charset@1.0.0
+47 verbose installOne of superagent-charset to /mnt/hgfs/project/www/biye not in flight; installing
+48 verbose lock using /root/.npm/_locks/superagent-charset-0b569070d1d5f797.lock for /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+49 silly install write writing superagent-charset 1.0.0 to /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+50 verbose unbuild node_modules/superagent-charset
+51 silly gentlyRm /mnt/hgfs/project/www/biye/node_modules/superagent-charset is being purged from base /mnt/hgfs/project/www/biye
+52 verbose gentlyRm don't care about contents; nuking /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+53 verbose tar unpack /root/.npm/superagent-charset/1.0.0/package.tgz
+54 verbose tar unpacking to /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+55 silly gentlyRm /mnt/hgfs/project/www/biye/node_modules/superagent-charset is being purged
+56 verbose gentlyRm don't care about contents; nuking /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+57 silly gunzTarPerm modes [ '755', '644' ]
+58 silly gunzTarPerm extractEntry package.json
+59 silly gunzTarPerm extractEntry README.md
+60 silly gunzTarPerm extractEntry index.js
+61 silly gunzTarPerm extractEntry CHANGELOG.md
+62 silly gunzTarPerm extractEntry .jsbeautifyrc
+63 silly gunzTarPerm extractEntry .eslintrc
+64 silly gunzTarPerm extractEntry test/test.js
+65 verbose write writing to /mnt/hgfs/project/www/biye/node_modules/superagent-charset/package.json
+66 info preinstall superagent-charset@1.0.0
+67 verbose readDependencies loading dependencies from /mnt/hgfs/project/www/biye/node_modules/superagent-charset/package.json
+68 verbose unlock done using /root/.npm/_locks/superagent-charset-0b569070d1d5f797.lock for /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+69 verbose stack Error: Failed to parse json
+69 verbose stack Unexpected end of input at 37:2
+69 verbose stack
+69 verbose stack  ^
+69 verbose stack     at parseError (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:379:11)
+69 verbose stack     at parseJson (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:68:23)
+69 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:48:5
+69 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:76:16
+69 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:380:3)
+70 verbose cwd /mnt/hgfs/project/www/biye
+71 error Linux 4.3.5-300.fc23.x86_64
+72 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "i" "superagent-charset" "--save"
+73 error node v4.2.4
+74 error npm  v2.14.12
+75 error file /mnt/hgfs/project/www/biye/node_modules/superagent-charset/package.json
+76 error code EJSONPARSE
+77 error Failed to parse json
+77 error Unexpected end of input at 37:2
+77 error
+77 error  ^
+78 error File: /mnt/hgfs/project/www/biye/node_modules/superagent-charset/package.json
+79 error Failed to parse package.json data.
+79 error package.json must be actual JSON, not just JavaScript.
+79 error
+79 error This is not a bug in npm.
+79 error Tell the package author to fix their package.json file. JSON.parse
+80 verbose exit [ 1, true ]
+81 verbose unbuild node_modules/superagent-charset
+82 silly gentlyRm /mnt/hgfs/project/www/biye/node_modules/superagent-charset is being purged from base /mnt/hgfs/project/www/biye
+83 verbose gentlyRm don't care about contents; nuking /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+84 silly vacuum-fs purging /mnt/hgfs/project/www/biye/node_modules/superagent-charset
+85 silly vacuum-fs quitting because other entries in /mnt/hgfs/project/www/biye/node_modules
