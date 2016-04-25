@@ -286,7 +286,7 @@ module.exports = function () {
          host: 'localhost',
          user: 'root',
          password: 'qz6124003',
-         database: 'zhongguancun',
+         database: 'zhongguancun1',
          connectionLimit: 15
          });
          console.log('connection local mysql success');

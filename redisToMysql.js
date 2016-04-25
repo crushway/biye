@@ -12,7 +12,7 @@ redisClient.on('connect', function () {
 });
 var tempUrl=[];
 //allCrawledUrl,unCrawledUrl,targetUrl,crawledUrl
-var allCrawledUrl=[],targetUrl=[],crawledUrl=[];
+// var allCrawledUrl=[],targetUrl=[],crawledUrl=[];
 /*
 async.series(
 
@@ -131,18 +131,23 @@ redisClient.smembers('crawledUrl', function (err, result) {
 
 
 
-var inserSql=function () {
-    redisClient.spop('allCrawledUrl', function (err, result) {
+/**
+ * targetUrl插入数据库
+ */
+
+
+var inserSqlTargetUrl=function () {
+    redisClient.spop('targetUrl', function (err, result) {
         if(err){
             console.log("err!!!")
         }else{
             // console.log('redis query ok!')
             tempUrl.push(result);
             if(tempUrl.length%10000==0){
-                baseModel.insertUnique('allCrawledUrl', tempUrl);
+                baseModel.insertUnique('targetUrl', tempUrl);
                 tempUrl=[];
             }
-            queryRedis()
+            queryRedisTargetUrl()
         }
     });
     /* redisClient.SRANDMEMBER('allCrawledUrl', function (err, result) {
@@ -156,14 +161,106 @@ var inserSql=function () {
      });*/
 }
 
-var queryRedis=function () {
+var queryRedisTargetUrl=function () {
+    redisClient.scard('targetUrl', function (err, result) {
+        if (err) {
+            console.log("err!!!")
+        } else {
+            console.log('redis query ok!' + result)
+            if (result != 0) {
+                inserSqlTargetUrl()
+            }else{
+                baseModel.insertUnique('targetUrl', tempUrl);
+
+            }
+
+        }
+    });
+}
+
+/**
+ * crawledUrl插入数据库
+ */
+
+var inserSqlCrawledUrl=function () {
+    redisClient.spop('crawledUrl', function (err, result) {
+        if(err){
+            console.log("err!!!")
+        }else{
+            // console.log('redis query ok!')
+            tempUrl.push(result);
+            if(tempUrl.length%10000==0){
+                baseModel.insertUnique('crawledUrl', tempUrl);
+                tempUrl=[];
+            }
+            queryRedisCrawledUrl()
+        }
+    });
+    /* redisClient.SRANDMEMBER('allCrawledUrl', function (err, result) {
+     if(err){
+     console.log("err!!!")
+     }else{
+     // console.log('redis query ok!')
+     baseModel.insert1('target_url', result);
+     queryRedis()
+     }
+     });*/
+}
+
+var queryRedisCrawledUrl=function () {
+    redisClient.scard('crawledUrl', function (err, result) {
+        if (err) {
+            console.log("err!!!")
+        } else {
+            console.log('redis query ok!' + result)
+            if (result != 0) {
+                inserSqlCrawledUrl()
+            }else{
+                baseModel.insertUnique('crawledUrl', tempUrl);
+
+            }
+
+        }
+    });
+}
+
+/**
+ * allCrawledUrl插入数据库
+ */
+
+var inserSqlAllCrawledUrl=function () {
+    redisClient.spop('allCrawledUrl', function (err, result) {
+        if(err){
+            console.log("err!!!")
+        }else{
+            // console.log('redis query ok!')
+            tempUrl.push(result);
+            if(tempUrl.length%10000==0){
+                baseModel.insertUnique('allCrawledUrl', tempUrl);
+                tempUrl=[];
+            }
+            queryRedisAllCrawledUrl()
+        }
+    });
+    /* redisClient.SRANDMEMBER('allCrawledUrl', function (err, result) {
+     if(err){
+     console.log("err!!!")
+     }else{
+     // console.log('redis query ok!')
+     baseModel.insert1('target_url', result);
+     queryRedis()
+     }
+     });*/
+}
+
+var queryRedisAllCrawledUrl=function () {
     redisClient.scard('allCrawledUrl', function (err, result) {
         if (err) {
             console.log("err!!!")
         } else {
             console.log('redis query ok!' + result)
             if (result != 0) {
-                inserSql()
+                inserSqlAllCrawledUrl()
             }else{
                 baseModel.insertUnique('allCrawledUrl', tempUrl);
 
@@ -172,4 +269,6 @@ var queryRedis=function () {
         }
     });
 }
-queryRedis();
+queryRedisAllCrawledUrl();
+// queryRedisCrawledUrl();
+// queryRedisTargetUrl();
