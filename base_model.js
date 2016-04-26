@@ -298,8 +298,8 @@ module.exports = function () {
          dbClient = mysql.createPool({
          host: 'localhost',
          user: 'root',
-         password: 'qz6124003',
-         database: 'zhongguancun',
+         password: '6124003',
+         database: 'zhongguancun2',
          connectionLimit: 15
          });
          console.log('connection local mysql success');

@@ -212,7 +212,7 @@ var queryRedisCrawledUrl=function () {
         if (err) {
             console.log("err!!!")
         } else {
-            console.log('redis query ok!' + result)
+            // console.log('redis query ok!' + result)
             if (result != 0) {
                 inserSqlCrawledUrl()
             }else{
@@ -258,7 +258,7 @@ var queryRedisAllCrawledUrl=function () {
         if (err) {
             console.log("err!!!")
         } else {
-            console.log('redis query ok!' + result)
+            // console.log('redis query ok!' + result)
             if (result != 0) {
                 inserSqlAllCrawledUrl()
             }else{

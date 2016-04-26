@@ -109,6 +109,9 @@ var getInitUrlList = function () {
         });
 }
 
+
+
+
 /**
  * 首页的url处理
  * @param arr
@@ -346,7 +349,7 @@ var bingfa = function () {
     }
     function count() {
         flag++;
-        if (flag == 40) {
+        if (flag == 40 && temp.length != 0) {
             redisClient.sadd('crawledUrl', temp, function (err, reply) {
                 if (err) {
                     console.log(err);
@@ -392,9 +395,11 @@ var bingfa = function () {
                     }
                     console.log('===========并发数为' + nowBingfa + '，进入并发查询=======')
                     async.mapLimit(temp, nowBingfa, function (url, callback) {
-                        // if(url)
-                        console.dir(url);
-                        getUrlList(url, callback);
+                        if(url.length!=0){
+                            getUrlList(url, callback);
+                        }else{
+                            callback(null,"url为空")
+                        }
                     }, function (err, result) {
                         // res.send(result);
                         console.log(result);
@@ -414,12 +419,6 @@ var bingfa = function () {
  * @param url
  */
 var getUrlList = function (url, callback) {
-    var urlArray = [];
-    // console.log("当前url" + prefix + url);
-    /* if (in_array(url, crawledUrl)) {
-     callback(null, "已经抓取过的url  " + url);
-     return;
-     }*/
     var reg = /http/;
     var target = /^\/\w.+index\d+\./;
     if (reg.exec(url) || url == null || url == 'undefined') {
@@ -434,27 +433,6 @@ var getUrlList = function (url, callback) {
         } else {
             getUrls(prefix + url, callback);
         }
-
-        /* request.get(prefix + url)
-         .end(function (err, res) {
-         if (err) {
-         console.log("请求url时出错");
-         callback(null, "请求错误   " + url);
-         } else {
-         var $ = cheerio.load(res.text);
-         $("a").each(function () {
-         urlArray.push($(this).attr("href"));
-         });
-         urlArray = handleUrl(urlArray);
-         callback(null, "成功抓取URL   " + url);
-         // console.dir(urlArray);
-         //插入数据库
-         /!*if (urlArray.length) {
-         baseModel.insertUnique(tableName, urlArray);
-         }*!/
-
-         }
-         });*/
     }
 
 }
@@ -477,12 +455,6 @@ var getUrls = function (url, callback) {
                 });
                 urlArray = handleUrl(urlArray);
                 callback(null, "成功抓取URL   " + url);
-                // console.dir(urlArray);
-                //插入数据库
-                /*if (urlArray.length) {
-                 baseModel.insertUnique(tableName, urlArray);
-                 }*/
-
             }
         });
 }
@@ -499,80 +471,52 @@ var getData = function (url, callback) {
             html += data;
         });
         res.on('end', function () {
+            var str = iconv.decode(new Buffer(html, 'binary'), 'gbk');
             var info = {};
-            var $ = cheerio.load(html);
+            var $ = cheerio.load(str);
             var something = $("div.breadcrumb a");
             async.series(
                 [
                     function (cb) {
                         //类别
                         var product_category = $(something[1]).text().trim();
-                        var buf = new Buffer(product_category, 'binary');
-                        product_category = iconv.decode(buf, 'GBK');
                         cb(null, product_category);
                     },
                     function (cb) {
                         //品牌
                         var product_brand = $(something[2]).text().trim();
-                        var buf = new Buffer(product_brand, 'binary');
-                        product_brand = iconv.decode(buf, 'GBK');
                         cb(null, product_brand);
+
                     },
                     function (cb) {
                         //商品名称
-                        var product_name;
                         if (something.length == 4) {
-                            product_name = $(".breadcrumb h1").text().trim();
-                            var buf = new Buffer(product_name, 'binary');
-                            product_name = iconv.decode(buf, 'GBK');
-
+                            var product_name = $(".breadcrumb h1").text().trim();
                         } else {
-                            product_name = $(".page-title h1").text().trim();
-                            var buf = new Buffer(product_name, 'binary');
-                            product_name = iconv.decode(buf, 'GBK');
+                            var product_name = $(".page-title h1").text().trim();
                         }
                         if (!product_name) {
-                            product_name = $(".product-name").text().trim();
-                            var buf = new Buffer(product_name, 'binary');
-                            product_name = iconv.decode(buf, 'GBK');
+                            var product_name = $(".product-name").text().trim();
                         }
                         if (!product_name) {
-                            product_name = $(".product-name").text().trim();
-                            var buf = new Buffer(product_name, 'binary');
-                            product_name = iconv.decode(buf, 'GBK');
-                        }
-                        if (!product_name) {
-                            product_name = $(".breadcrumb span").text().trim();
-                            var buf = new Buffer(product_name, 'binary');
-                            product_name = iconv.decode(buf, 'GBK');
+                            var product_name = $(".breadcrumb span").text().trim();
                         }
                         cb(null, product_name);
-
-
                     },
                     function (cb) {
                         //商品描述
                         var product_desc = $(".subtitle").text().trim();
-                        if (product_desc) {
-                            var buf = new Buffer(product_desc, 'binary');
-                            product_desc = iconv.decode(buf, 'GBK');
-                            cb(null, product_desc);
-                        } else {
+                        if (!product_desc) {
                             cb(null, '无');
                         }
                     },
                     function (cb) {
                         //价格
                         var product_price = $(".price-sign").next().text().trim();
-                        if (product_price) {
-
-                        } else {
+                        if (!product_price) {
                             product_price = $(".price-type").text().trim();
                         }
-                        var buf = new Buffer(product_price, 'binary');
-                        product_price = iconv.decode(buf, 'GBK');
                         cb(null, product_price);
-
                     }
                 ], function (err, values) {
                     info.product_category = values[0];
@@ -581,7 +525,6 @@ var getData = function (url, callback) {
                     info.product_desc = values[3];
                     info.product_price = values[4];
                     info.product_url = url;
-
                     baseModel.insertProduct('product', info);
                 }
             )
@@ -761,5 +704,4 @@ var downloadImg = function (asyncNum) {
     });
 
 };
-
 getInitUrlList();
