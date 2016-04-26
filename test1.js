@@ -17,7 +17,7 @@ targetUrl = [];//目标商品页面
 
 //allCrawledUrl,uncrawledUrl,targetUrl,crawledUrl
 
-const bfNumber = 10;
+const bfNumber = 20;
 var BaseModel = require('./base_model')
     , baseModel = new BaseModel()
     , rowInfo = {}
