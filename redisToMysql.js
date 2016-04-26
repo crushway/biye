@@ -217,7 +217,7 @@ var queryRedisCrawledUrl=function () {
                 inserSqlCrawledUrl()
             }else{
                 baseModel.insertUnique('crawledUrl', tempUrl);
-
+                queryRedisTargetUrl();
             }
 
         }
@@ -263,12 +263,11 @@ var queryRedisAllCrawledUrl=function () {
                 inserSqlAllCrawledUrl()
             }else{
                 baseModel.insertUnique('allCrawledUrl', tempUrl);
-
+                queryRedisCrawledUrl();
             }
-
         }
     });
 }
 queryRedisAllCrawledUrl();
-// queryRedisCrawledUrl();
-// queryRedisTargetUrl();
+//
+//

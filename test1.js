@@ -338,7 +338,7 @@ var bingfa = function () {
     var flag = 0;
     for (var i = 0; i < 40; i++) {
         redisClient.spop('unCrawledUrl', function (err, result) {
-            if (result != 'nil') {
+            if (result != null) {
                 temp.push(result);
             }
             count();
@@ -384,7 +384,7 @@ var bingfa = function () {
                         }
                         console.log('已爬crawledUrl:' + result);
                     })
-                    if (temp.length < 10) {
+                    if (temp.length < bfNumber) {
                         //最后需要爬取的url很少达不到并发数，需要改变并发数
                         var nowBingfa = temp.length;
                     } else {
