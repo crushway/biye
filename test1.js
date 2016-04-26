@@ -466,7 +466,7 @@ var getUrlList = function (url, callback) {
  */
 var getUrls = function (url, callback) {
     var urlArray = [];
-    request.get(url).set(config)
+    request.get(url)
         .end(function (err, res) {
             if (err) {
                 callback(null, "请求错误   " + url);
